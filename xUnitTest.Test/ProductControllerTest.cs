@@ -1,10 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using xUnitTest.Web.Controllers;
 using xUnitTest.Web.Entities;
 using xUnitTest.Web.Repository;
@@ -35,6 +30,7 @@ namespace xUnitTest.Test
             Assert.IsType<ViewResult>(result);
         }
 
+        [Fact]
         public async void Index_ActionExecutes_ReturnProductList()
         {
             _mockRepo.Setup(repo => repo.GetAllAsync()).ReturnsAsync(_products);
@@ -45,6 +41,14 @@ namespace xUnitTest.Test
             var ProductList = Assert.IsAssignableFrom<IEnumerable<Product>>(viewResult.Model);
 
             Assert.Equal<int>(2, ProductList.Count());
+        }
+
+        [Fact]
+        public async void Detail_IdIsNull_ReturnRedirectToIndexAction()
+        {
+            var result = await _controller.Details(null);
+            var redirect = Assert.IsType<RedirectToActionResult>(result);
+            Assert.Equal("Index", redirect.ActionName);
         }
     }
 }
