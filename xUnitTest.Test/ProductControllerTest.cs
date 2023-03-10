@@ -50,5 +50,35 @@ namespace xUnitTest.Test
             var redirect = Assert.IsType<RedirectToActionResult>(result);
             Assert.Equal("Index", redirect.ActionName);
         }
+
+        [Fact]
+        public async void Details_IdInValid_ReturnNotFound()
+        {
+            Product product = null;
+            _mockRepo.Setup(x => x.GetByIdAsync(0)).ReturnsAsync(product);
+
+            var result = await _controller.Details(0);
+
+            var redirect = Assert.IsType<NotFoundResult>(result);
+
+            Assert.Equal<int>(404, redirect.StatusCode);
+        }
+
+        [Theory]
+        [InlineData(1)]
+        public async void Details_Action_ValidId_ReturnProduct(int ProductId)
+        {
+            Product product = _products.First(x => x.Id == ProductId);
+            _mockRepo.Setup(repo => repo.GetByIdAsync(ProductId)).ReturnsAsync(product);
+
+            var result = await _controller.Details(ProductId);
+
+            var viewResult = Assert.IsType<ViewResult>(result);
+
+            var resultProduct = Assert.IsAssignableFrom<Product>(viewResult.Model);
+
+            Assert.Equal(product.Id, resultProduct.Id);
+            Assert.Equal(product.Name, resultProduct.Name);
+        }
     }
 }
