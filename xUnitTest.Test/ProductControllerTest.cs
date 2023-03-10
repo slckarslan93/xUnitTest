@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Moq;
+using System.Drawing.Printing;
 using xUnitTest.Web.Controllers;
 using xUnitTest.Web.Entities;
 using xUnitTest.Web.Repository;
@@ -79,6 +80,73 @@ namespace xUnitTest.Test
 
             Assert.Equal(product.Id, resultProduct.Id);
             Assert.Equal(product.Name, resultProduct.Name);
+        }
+
+        [Fact]
+        public void Create_ActionExecute_ReturnView()
+        {
+            var result = _controller.Create();
+            Assert.IsType<ViewResult>(result);
+        }
+
+        [Fact]
+        public async void CreatePOST_InValidModelState_ReturnView()
+        {
+            _controller.ModelState.AddModelError("Name", "Name alanı gereklidir");
+            var result = await _controller.Create(_products.First());
+            var viewResult = Assert.IsType<ViewResult>(result);
+            Assert.IsType<Product>(viewResult.Model);
+        }
+
+        [Fact]
+        public async void CreatePOST_ValidModelState_ReturnRedirectToIndexAction()
+        {
+            var result = await _controller.Create(_products.First());
+
+            var redirect = Assert.IsType<RedirectToActionResult>(result);
+            Assert.Equal("Index", redirect.ActionName);
+        }
+
+        [Fact]
+        public async void CreatePOST_ValidModelState_CreateMethodExecute()
+        {
+            Product newProduct = null;
+            _mockRepo.Setup(repo => repo.CreateAsync(It.IsAny<Product>())).Callback<Product>(x => newProduct = x);
+
+            var result = await _controller.Create(_products.First());
+
+            _mockRepo.Verify(repo => repo.CreateAsync(It.IsAny<Product>()), Times.Once);
+
+            Assert.Equal(_products.First().Id, newProduct.Id);
+        }
+
+        [Fact]
+        public async void CreatePOST_InValidModalState_NeverCreateExecute()
+        {
+            _controller.ModelState.AddModelError("Name", "");
+            var result = await _controller.Create(_products.First());
+            _mockRepo.Verify(repo => repo.CreateAsync(It.IsAny<Product>()), Times.Never);
+        }
+
+        [Fact]
+        public async void Edit_IdIsNull_ReturnRedirectToIndexAction()
+        {
+            var result = await _controller.Edit(null);
+            var redirect = Assert.IsType<RedirectToActionResult>(result);
+
+            Assert.Equal("Index", redirect.ActionName);
+        }
+
+        [Theory]
+        [InlineData(3)]
+        public async void Edit_IdInValid_ReturnNotFound(int productId)
+        {
+            Product product = null;
+            _mockRepo.Setup(x => x.GetByIdAsync(productId)).ReturnsAsync(product);
+
+            var result = await _controller.Edit(productId);
+            var redirect = Assert.IsType<NotFoundResult>(result);
+            Assert.Equal<int>(404, redirect.StatusCode);
         }
     }
 }
