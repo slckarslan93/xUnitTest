@@ -89,21 +89,8 @@ namespace xUnitTest.Web.Controllers
 
             if (ModelState.IsValid)
             {
-                try
-                {
-                    _repository.Update(product);
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ProductExists(product.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                _repository.Update(product);
+
                 return RedirectToAction(nameof(Index));
             }
             return View(product);
