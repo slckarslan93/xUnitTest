@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Moq;
-using System.Drawing.Printing;
 using xUnitTest.Web.Controllers;
 using xUnitTest.Web.Entities;
 using xUnitTest.Web.Repository;

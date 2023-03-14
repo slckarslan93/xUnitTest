@@ -8,7 +8,6 @@ namespace xUnitTest.Web.Context
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlServer("Data Source=.; Initial Catalog=xUnitTestDb; Integrated Security=true;TrustServerCertificate = true;");
-
         }
 
         public DbSet<Product> Products { get; set; }

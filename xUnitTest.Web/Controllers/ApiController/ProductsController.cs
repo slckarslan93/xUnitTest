@@ -6,7 +6,7 @@ using xUnitTest.Web.Repository;
 
 namespace xUnitTest.Web.Controllers.ApiController
 {
-    [Route("api/[controller]/[action]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class ProductsController : ControllerBase
     {
