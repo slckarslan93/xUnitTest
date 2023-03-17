@@ -1,6 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using xUnitTest.Web.Context;
 using xUnitTest.Web.Entities;
 using xUnitTest.Web.Repository;
 
